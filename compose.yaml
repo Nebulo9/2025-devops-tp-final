@@ -1,0 +1,27 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:15-alpine
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U postgres -d postgres'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
+  backend:
+    container_name: backend
+    image: nebulo9/2025-devops-tp-final-backend:latest
+    ports:
+      - 8080:8080
+    env_file:
+      - backend/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
